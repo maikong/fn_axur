@@ -10,6 +10,7 @@ import base64
 load_dotenv()
 axur_url = os.getenv("AXUR_URL", None)
 axur_token = os.getenv("AXUR_TOKEN", None)
+axur_url_leaks = os.getenv("AXUR_URL_LEAKS", None)
 #DEBUG = str(os.getenv("DEBUG").lower) == "true"
 
 def axur_get_new_incidents():
@@ -82,23 +83,36 @@ def axur_get_image(url):
             logger.error(f'Falha ao consultar imagem na AXUR - {response.status_code} - {response.text}')
             return None
 
-def axur_get_incidents():
+def axur_get_new_employee_credentials():
+    detections = []
+    detection = dict()
     headers = {
         "Authorization": f"Bearer {axur_token}",
         "Content-Type": "application/json"
     }
 
     try:
-        response = requests.get(axur_url, headers=headers)
+        response = requests.get(axur_url_leaks, headers=headers)
     except Exception as erro:
-        logger.critical(f'Falha em consultar incidente na AXUR - {erro}')
+        logger.critical(f'Falha ao consultar credenciais de colaboradores - {erro}')
     else:
         if response.status_code == 200:
             data = response.json()
-            tickets = data['collectionData']['tickets']
-            return tickets
+            axur_detections = data['collectionData']['detections']
+            for d in axur_detections:
+                detection = {
+                    "id": d['id'],
+                    "source": d['source.name'],
+                    "user": d['user'],
+                    "password": d['password'],
+                    "status": d['status'],
+                    "types": d['credential.types'],
+                    "domain": d['user.emailDomain'],
+                }
+                detections.append(detection)
+            return detections
         else:
-            logger.error(f'Falha ao consultar incidentes na AXUR - {response.status_code} - {response.text}')
+            logger.error(f'Falha ao consultar credenciais de colaboradores- {response.status_code} - {response.text}')
             return None
 
 
@@ -147,6 +161,9 @@ def axur_comment_ticket(ticket_key, comment):
 
 
 #print (json.dumps(axur_get_new_incidents(), indent=2))
+#data = axur_get_new_employee_credentials()
+#print (json.dumps(data, indent=2))
+#print (len(data))
 #print (json.dumps(axur_get_ticket("s3zmr7"), indent=2))
 #print (json.dumps(axur_comment_ticket("s3zmr7","Teste de comentário"), indent=2))
 
