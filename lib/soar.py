@@ -1,7 +1,7 @@
 import os
 from requests.auth import HTTPBasicAuth
 from loguru import logger
-from axur import *
+from lib.axur import *
 import requests
 import json
 import time

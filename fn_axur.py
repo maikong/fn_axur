@@ -1,6 +1,6 @@
 #from resilient_lib import build_resilient_url
-from axur import *
-from soar import *
+from lib.axur import *
+from lib.soar import *
 from requests.auth import HTTPBasicAuth
 from dotenv import load_dotenv
 from loguru import logger
@@ -47,14 +47,8 @@ def pooler_new_employee_credentials():
         #        soar_new_incident(incident)
         else:
             logger.warning("Nenhuma nova credencial vazada foi identificada")
-        time.sleep(60)
+        time.sleep(300)
 
 
-threading.Thread(target=pooler_new_incidents).start()
-threading.Thread(target=pooler_new_employee_credentials).start()
-
-
-#soar_new_incident_artifact("3728","URL","http://www.arezzo.com.br","teste")
-
-#url = "https://api.axur.com/gateway/1.0/api/files/file/b25f462b8010cd0f9d142150a26e9af6e325d1a3e6485d8a50604c49a0dbe38f-7dd84a743fdb4ee69b7670b8d5a8a13b.jpg"
-#soar_new_incident_comment(3731, axur_get_image(url))
+#threading.Thread(target=pooler_new_incidents).start()
+#threading.Thread(target=pooler_new_employee_credentials).start()
