@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 from requests.auth import HTTPBasicAuth
 from loguru import logger
@@ -12,6 +13,40 @@ soar_org =  os.getenv("SOAR_ORG")
 soar_key_id = os.getenv("SOAR_KEY_ID")
 soar_key_secret = os.getenv("SOAR_KEY_SECRET")
 soar_ca_cert = os.getenv("SOAR_CA_CERT")
+
+class SoarApiCommon():
+    def __init__(self):
+        self.soar_host = os.getenv("SOAR_HOST")
+        self.soar_port = os.getenv("SOAR_PORT")
+        self.soar_org =  os.getenv("SOAR_ORG")
+        self.soar_key_id = os.getenv("SOAR_KEY_ID")
+        self.soar_key_secret = os.getenv("SOAR_KEY_SECRET")
+        self.soar_ca_cert = os.getenv("SOAR_CA_CERT")
+    
+    def request(self, method:str, url:str, payload=None):
+        headers = {"Content-Type": "application/json"}
+        auth = HTTPBasicAuth(self.soar_key_id, self.soar_key_secret)
+        try:
+            if method.upper == "GET":
+                response = requests.get(url, headers=headers, auth=auth, verify=self.soar_ca_cert)
+            if method.upper == "POST":
+                response = requests.post(url, headers=headers, data=json.dumps(payload) ,auth=auth, verify=self.soar_ca_cert)
+        except Exception as err:
+            logger.critical(str(err))
+        else:
+            if response.status_code == 200:
+                return response.json()
+            else:
+                logger.error(response.json())
+                return None
+            
+    def add_incident(self, description, type, payload):
+        url = "https://{}:{}/rest/orgs/{}/incidents".format(soar_host,soar_port,soar_org)
+        response = self.request("POST", url, description, type, payload)
+        if response:
+            return response
+        else:
+            return None
 
 def soar_get_incident(id):
     """
@@ -128,7 +163,7 @@ def soar_new_incident(axur_incident):
             soar_new_incident_artifact(incident_id,"IP Address", axur_incident['ip'],"IP do Host")
             soar_new_incident_artifact(incident_id,"URL",axur_incident['url'],"URL do site falso")
 
-            soar_new_incident_comment(incident_id, axur_get_image(axur_incident['jpg']))
+            #soar_new_incident_comment(incident_id, axur_get_image(axur_incident['jpg']))
 
         else:     
             logger.error(f'Falha ao criar incidente no SOAR - {response.status_code} - {response.text}')
