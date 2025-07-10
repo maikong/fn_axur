@@ -32,8 +32,8 @@ def pooler_new_incidents():
         new_incidents = axur.get_new_incidents()
         if new_incidents:
             logger.warning(f'Indentificado {len(new_incidents)} novos incidentes.')
-            #for incident in new_incidents:
-            #    soar_new_incident(incident)
+            for incident in new_incidents:
+                soar_new_incident(incident)
         else:
             logger.info("Nenhum novo incidente localizado.")
         
