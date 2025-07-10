@@ -2,6 +2,6 @@ __pycache__/
 .env
 venv/
 *.log
-test.py
-api.http
 app.config
+api.http
+test.py
