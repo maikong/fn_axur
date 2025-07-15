@@ -55,7 +55,7 @@ class AxurAPICommon:
                 jpg = next((item['url'] for item in t['attachments'] if item['name'].lower().endswith('.jpg')),None)
                 txt = next((item['url'] for item in t['attachments'] if item['name'].lower().endswith('.txt')),None)
                 incident = {
-                    "id": str(t.get('id')) or "",
+                    "id": str(t.get('ticket').get('ticketKey')) or "",
                     "ticketKey": str(t.get('ticket').get('ticketKey')) or "",
                     "tipo": str(t.get('detection').get('type')) or "",
                     "titulo": str(t.get('reference')) or "",

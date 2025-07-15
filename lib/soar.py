@@ -48,6 +48,21 @@ class SoarApiCommon():
         else:
             return None
 
+    def add_artifact(self, incident_id, type, value, description=""):
+        url = "https://{}:{}/rest/orgs/{}/incidents/{}/artifacts".format(soar_host,soar_port,soar_org,incident_id)
+        payload = {
+            "type": type,
+            "value": value,
+            "description": description
+        }
+        response = self.request("POST", url, payload)
+        if response:
+            return response
+        else:
+            return None
+
+
+
 def soar_get_incident(id):
     """
     Consulta um incidente específico no SOAR através de seu ID.

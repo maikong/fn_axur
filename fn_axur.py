@@ -14,15 +14,6 @@ load_dotenv()
 logger.add("fn_axur.log", rotation="10 MB")
 
 POLLER_TIME = int(os.getenv("POLLER_TIME"))
-#soar_host = os.getenv("SOAR_HOST")
-#soar_port = os.getenv("SOAR_PORT")
-#soar_org =  os.getenv("SOAR_ORG")
-#soar_key_id = os.getenv("SOAR_KEY_ID")
-#soar_key_secret = os.getenv("SOAR_KEY_SECRET")
-#soar_ca_cert = os.getenv("SOAR_CA_CERT")
-
-#axur_url = os.getenv("AXUR_URL")
-#axur_token = os.getenv("AXUR_TOKEN")
 
 def pooler_new_incidents():
     axur = AxurAPICommon()
@@ -33,7 +24,10 @@ def pooler_new_incidents():
         if new_incidents:
             logger.warning(f'Indentificado {len(new_incidents)} novos incidentes.')
             for incident in new_incidents:
-                soar_new_incident(incident)
+                result = soar_new_incident(incident)
+                if result:
+                    result.get('id')
+                
         else:
             logger.info("Nenhum novo incidente localizado.")
         
