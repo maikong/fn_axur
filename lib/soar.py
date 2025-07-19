@@ -192,7 +192,7 @@ def soar_new_incident(axur_incident):
             soar_new_incident_comment(incident_id, description)
             soar_new_incident_artifact(incident_id,"IP Address", axur_incident['ip'],"IP do Host")
             soar_new_incident_artifact(incident_id,"URL",axur_incident['url'],"URL do site falso")
-            soar_new_incident_comment(incident_id, AxurAPICommon.get_incident_image(axur_incident['jpg']))
+            #soar_new_incident_comment(incident_id, AxurAPICommon.get_incident_image(axur_incident['jpg']))
 
         else:     
             logger.error(f'Falha ao criar incidente no SOAR - {response.status_code} - {response.text}')

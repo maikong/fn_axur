@@ -74,7 +74,8 @@ def pooler_new_clients_credentials():
         if client_leaks:
             logger.warning(f'Identificada {len(client_leaks)} novas credenciais vazadas de clientes.')
             soar = SoarApiCommon()
-            for i in client_leaks[:1]:
+            #for i in client_leaks[:1]:
+            for i in client_leaks:
                 description = f"""
                 Uma credencial de usuário vazada foi identificada.
                 Origem: {i['source']}
