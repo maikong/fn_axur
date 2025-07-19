@@ -110,7 +110,7 @@ def pooler_new_clients_credentials():
         time.sleep(POLLER_TIME)
 
 
-#threading.Thread(target=pooler_new_incidents).start()
+threading.Thread(target=pooler_new_incidents).start()
 #threading.Thread(target=pooler_new_employee_credentials).start()
 threading.Thread(target=pooler_new_clients_credentials).start()
 
