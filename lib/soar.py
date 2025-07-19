@@ -26,10 +26,11 @@ class SoarApiCommon():
     def request(self, method:str, url:str, payload=None):
         headers = {"Content-Type": "application/json"}
         auth = HTTPBasicAuth(self.soar_key_id, self.soar_key_secret)
+        response = None
         try:
-            if method.upper == "GET":
+            if method.upper() == "GET":
                 response = requests.get(url, headers=headers, auth=auth, verify=self.soar_ca_cert)
-            if method.upper == "POST":
+            if method.upper() == "POST":
                 response = requests.post(url, headers=headers, data=json.dumps(payload) ,auth=auth, verify=self.soar_ca_cert)
         except Exception as err:
             logger.critical(str(err))
@@ -40,9 +41,9 @@ class SoarApiCommon():
                 logger.error(response.json())
                 return None
             
-    def add_incident(self, description, type, payload):
+    def add_incident(self, payload):
         url = "https://{}:{}/rest/orgs/{}/incidents".format(soar_host,soar_port,soar_org)
-        response = self.request("POST", url, description, type, payload)
+        response = self.request("POST", url, payload)
         if response:
             return response
         else:
@@ -55,11 +56,25 @@ class SoarApiCommon():
             "value": value,
             "description": description
         }
+        
         response = self.request("POST", url, payload)
         if response:
             return response
         else:
             return None
+        
+    def add_comment(self, incident_id:int, comment:str):
+        url = "https://{}:{}/rest/orgs/{}/incidents/{}/comments".format(self.soar_host,self.soar_port,self.soar_org,incident_id)
+        payload = {
+            "text": {
+                "format": "html",
+                "content": comment
+            }
+        }
+       
+        response = self.request("POST", url, payload)
+        if response.status_code == 200:
+            logger.info(f'Comentário adicionado no incidente {incident_id} do SOAR.')    
 
 
 
@@ -177,8 +192,7 @@ def soar_new_incident(axur_incident):
             soar_new_incident_comment(incident_id, description)
             soar_new_incident_artifact(incident_id,"IP Address", axur_incident['ip'],"IP do Host")
             soar_new_incident_artifact(incident_id,"URL",axur_incident['url'],"URL do site falso")
-
-            #soar_new_incident_comment(incident_id, axur_get_image(axur_incident['jpg']))
+            soar_new_incident_comment(incident_id, AxurAPICommon.get_incident_image(axur_incident['jpg']))
 
         else:     
             logger.error(f'Falha ao criar incidente no SOAR - {response.status_code} - {response.text}')

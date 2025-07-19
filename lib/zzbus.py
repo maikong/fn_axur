@@ -27,9 +27,9 @@ class ZZBusApiCommon():
           "Content-Type": "application/json"
       }
       try: 
-          if method == "GET":
+          if method.upper() == "GET":
                 response = requests.get(url, headers=headers)
-          if method == "POST":
+          if method.upper() == "POST":
                 print(headers)
                 response = requests.post(url, headers=headers, data=json.dumps(payload))
       except Exception as err:

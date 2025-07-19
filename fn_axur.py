@@ -24,9 +24,7 @@ def pooler_new_incidents():
         if new_incidents:
             logger.warning(f'Indentificado {len(new_incidents)} novos incidentes.')
             for incident in new_incidents:
-                result = soar_new_incident(incident)
-                if result:
-                    result.get('id')
+                soar_new_incident(incident)
                 
         else:
             logger.info("Nenhum novo incidente localizado.")
@@ -72,17 +70,47 @@ def pooler_new_clients_credentials():
     logger.info("Iniciado monitoramento de credenciais de clientes")
     while True:
         logger.info("Consultando novas credenciais de clientes...")
-        new_credentials = axur.get_new_client_leaks()
-        if new_credentials:
-            logger.warning(f'Identificada {len(new_credentials)} novas credenciais vazadas de clientes.')
-        #    for incident in new_incidents:
-        #        soar_new_incident(incident)
+        client_leaks = axur.get_new_client_leaks()
+        if client_leaks:
+            logger.warning(f'Identificada {len(client_leaks)} novas credenciais vazadas de clientes.')
+            soar = SoarApiCommon()
+            for i in client_leaks[:1]:
+                description = f"""
+                Uma credencial de usuário vazada foi identificada.
+                Origem: {i['source']}
+                Usuário: {i['user']}
+                Acesso: {i['access.host']}
+                Axur ID: {i['id']}
+                """
+                payload = {
+                    "inc_training": True,
+                    "name": "[AXUR] Credencial de cliente",
+                    "description": description,
+                    "discovered_date": int(time.time() * 1000),
+                    "external_id": i['id'],
+                    "incident_type_ids": ['CTI - Credenciais de clientes',],
+                    "confirmed": True,
+                    "data_compromised": False,
+                    "severity_code": 5,
+                    "properties": {
+                        "axur_id": i['id'],
+                        "axur_credencial": i['user'],
+                    },
+                    "pii": {
+                        "data_compromised": False,
+                    }
+                }
+                soar_incident = soar.add_incident(payload)
+                if soar_incident:
+                    logger.info(f'Aberto o incidente {soar_incident.get('id')} no SOAR')
+                else:
+                    logger.error('Falha em abrir o incidente no SOAR!')
         else:
             logger.info("Nenhuma nova credencial vazada foi identificada")
         time.sleep(POLLER_TIME)
 
 
-threading.Thread(target=pooler_new_incidents).start()
+#threading.Thread(target=pooler_new_incidents).start()
 #threading.Thread(target=pooler_new_employee_credentials).start()
-#threading.Thread(target=pooler_new_clients_credentials).start()
+threading.Thread(target=pooler_new_clients_credentials).start()
 

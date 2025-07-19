@@ -9,9 +9,6 @@ from PIL import Image
 import base64
 
 load_dotenv()
-#axur_url = os.getenv("AXUR_URL", None)
-#axur_token = os.getenv("AXUR_TOKEN", None)
-#axur_url_leaks = os.getenv("AXUR_URL_LEAKS", None)
 
 class AxurAPICommon:
     url = dict()
@@ -74,6 +71,7 @@ class AxurAPICommon:
                 inicidents.append(incident)
         return inicidents
     
+    @staticmethod
     def get_incident_image(self, url:str) -> str:
         try:
             response = self.request("GET", url)
